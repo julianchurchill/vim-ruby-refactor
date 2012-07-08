@@ -15,22 +15,7 @@ Feature: Extract method
             end
             """
         When I visually highlight "a == b"
-        And I call the vim function ":ExtractMethod"
-        Then I should be prompted for a function name
-
-    @next
-    Scenario: Extract method with parameters
-        Given a ruby source buffer in vim with the following content:
-            """
-            def an_arbitrary_function( a, b )
-              if a == b
-                return "equal"
-              end
-              return "not equal"
-            end
-            """
-        When I visually highlight "a == b"
-        And I call the vim function ":ExtractMethod"
+        And I call the vim function "ExtractMethod"
         And I supply the argument "test_equality"
         Then the buffer should contain:
             """
