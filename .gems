@@ -8,6 +8,10 @@ gherkin -v2.11.1
 json -v1.7.3
 macaddr -v1.6.1
 robot-vim -v2.0.0
+rspec -v2.11.0
+rspec-core -v2.11.0
+rspec-expectations -v2.11.0
+rspec-mocks -v2.11.0
 systemu -v2.5.1
 uuid -v2.3.5
 ZenTest -v4.8.1
