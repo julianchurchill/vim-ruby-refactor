@@ -3,5 +3,5 @@ rvm use 1.9.3@vim-ruby-refactor --create
 if [[ -s ".gems" ]]
 then
     rvm gemset import ".gems"
-end
+fi
 
