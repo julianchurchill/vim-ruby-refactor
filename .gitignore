@@ -16,3 +16,7 @@ tmp
 .yardoc
 _yardoc
 doc/
+
+# vim swap files
+*.swp
+*.swo
