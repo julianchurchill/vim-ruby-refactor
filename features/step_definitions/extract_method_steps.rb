@@ -26,6 +26,7 @@ When /^I call the vim function ":ExtractMethod"$/ do
 end
 
 When /^I supply the argument "(.*?)"$/ do |argument|
+  # This hangs, probably because we don't prompt for an argument for :ExtractMethod yet...
   #commands = <<-COMMANDS
     ##{argument}
   #COMMANDS

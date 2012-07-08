@@ -3,6 +3,22 @@ Feature: Extract method
     As a vim and ruby user
     I want to use the extract method refactoring within vim
 
+    @wip
+    Scenario: Extract method with parameters
+        Given a ruby source buffer in vim with the following content:
+            """
+            def an_arbitrary_function( a, b )
+              if a == b
+                return "equal"
+              end
+              return "not equal"
+            end
+            """
+        When I visually highlight "a == b"
+        And I call the vim function ":ExtractMethod"
+        Then I should be prompted for a function name
+
+    @next
     Scenario: Extract method with parameters
         Given a ruby source buffer in vim with the following content:
             """
