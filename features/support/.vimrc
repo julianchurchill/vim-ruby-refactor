@@ -3,7 +3,8 @@ function! ExtractMethod()
     let name = input( "Enter function name:" )
     call inputrestore()
 ruby << EOF
-  @buffer = VIM::Buffer.current
-  @buffer.append( @buffer.count, VIM::evaluate( 'name' ) )
+  require 'lib/rubyrefactorer.rb'
+  r = RubyRefactorer.new
+  r.extract_method
 EOF
 endfunction
