@@ -2,7 +2,6 @@
 # 1 based - to match Vims notion of ranges
 class Range
   attr_reader :start_line, :end_line, :start_character, :end_character
-  attr_accessor :end_character
 
   def initialize sl, sc, el, ec
     @start_line = sl
