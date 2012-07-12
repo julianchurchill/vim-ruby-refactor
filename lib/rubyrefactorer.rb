@@ -14,14 +14,20 @@ end
 class RubyRefactorer
   def extract_method name, buffer, range
     (range.start_line..range.end_line).each do |line_number|
-      line = ""
-      if line_number == range.start_line
-        line = extract_line_start buffer[ line_number ], range
+      if (line_number != range.start_line and line_number != range.end_line) or
+        (line_number == range.start_line and range.start_character == 1 and line_number != range.end_line) or
+        (line_number == range.end_line and range.end_character == 2147483647 and line_number != range.start_line)
+        buffer.delete( line_number )
+      else
+        line = ""
+        if line_number == range.start_line
+          line = extract_line_start buffer[ line_number ], range
+        end
+        if line_number == range.end_line
+          line += extract_line_end buffer[ line_number ], range
+        end
+        buffer[ line_number ] = line
       end
-      if line_number == range.end_line
-        line += extract_line_end buffer[ line_number ], range
-      end
-      buffer[ line_number ] = line
     end
   end
 

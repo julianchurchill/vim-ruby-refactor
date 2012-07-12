@@ -32,31 +32,28 @@ describe "RubyRefactorer" do
     buffer = double( 'current vim buffer' )
     buffer.stub( :[] ).with( 2 ).and_return( "12345678" )
     buffer.stub( :[] ).with( 3 ).and_return( "abcdefgh" )
-    buffer.stub( :[] ).with( 4 ).and_return( "abcdefgh" )
     buffer.should_receive( :[]= ).with( 2, "12" )
-    buffer.should_receive( :[]= ).with( 3, "" )
-    buffer.should_receive( :[]= ).with( 4, "gh" )
+    buffer.should_receive( :[]= ).with( 3, "gh" )
     r = RubyRefactorer.new
 
-    range = Range.new 2, 3, 4, 6
+    range = Range.new 2, 3, 3, 6
     r.extract_method "new_method_name", buffer, range
   end
 
-  it "should cut multi line highlighted text from the vim buffer with extreme ranges" do
+  it "should cut whole lines from multi line highlighted text from the vim buffer with extreme ranges" do
     buffer = double( 'current vim buffer' )
     buffer.stub( :[] ).with( 2 ).and_return( "12345678" )
     buffer.stub( :[] ).with( 3 ).and_return( "abcdefgh" )
     buffer.stub( :[] ).with( 4 ).and_return( "abcdefgh" )
-    buffer.should_receive( :[]= ).with( 2, "" )
-    buffer.should_receive( :[]= ).with( 3, "" )
-    buffer.should_receive( :[]= ).with( 4, "" )
+    buffer.should_receive( :delete ).with( 2 )
+    buffer.should_receive( :delete ).with( 3 )
+    buffer.should_receive( :delete ).with( 4 )
     r = RubyRefactorer.new
 
     range = Range.new 2, VIM_FULL_LINE_SELECTION_COLUMN_START, 4, VIM_FULL_LINE_SELECTION_COLUMN_END
     r.extract_method "new_method_name", buffer, range
   end
 
-  it "should remove whole lines that are included in the highlighted text without leaving a blank line"
   it "should join partial lines that are included in the highlighted text"
   it "should paste the highlighted text after the current function"
   it "should precede the pasted text with a new line and the function definition"
