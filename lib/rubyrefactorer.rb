@@ -41,16 +41,20 @@ class RubyRefactorer
     @buffer = buffer
     @range = range
     (@range.start_line..@range.end_line).each do |line_number|
-      if @range.whole_line_is_in_range? line_number
-        @lines_to_delete += [ line_number ]
-      else
-        remove_partial_line line_number
-      end
+      remove_highlighted_part_of_line line_number
     end
     remove_lines_scheduled_for_delete
   end
 
-  def remove_partial_line line_number
+  def remove_highlighted_part_of_line line_number
+    if @range.whole_line_is_in_range? line_number
+      @lines_to_delete += [ line_number ]
+    else
+      remove_partially_highlighted_line line_number
+    end
+  end
+
+  def remove_partially_highlighted_line line_number
     line = ""
     if line_number == @range.start_line
       line = extract_line_start @buffer[ line_number ]
