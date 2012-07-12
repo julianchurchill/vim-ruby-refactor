@@ -15,9 +15,6 @@ module VIM
 end
 
 describe "RubyRefactorer" do
-  VIM_FULL_LINE_SELECTION_COLUMN_START = 1
-  VIM_FULL_LINE_SELECTION_COLUMN_END = 2147483647
-
   it "should cut single line highlighted text from the vim buffer" do
     buffer = double( 'current vim buffer' )
     buffer.stub( :[] ).with( 2 ).and_return( "12345678" )
@@ -45,12 +42,13 @@ describe "RubyRefactorer" do
     buffer.stub( :[] ).with( 2 ).and_return( "12345678" )
     buffer.stub( :[] ).with( 3 ).and_return( "abcdefgh" )
     buffer.stub( :[] ).with( 4 ).and_return( "abcdefgh" )
+    # Delete line 2 three times because after each delete the indices are renumbered
     buffer.should_receive( :delete ).with( 2 )
-    buffer.should_receive( :delete ).with( 3 )
-    buffer.should_receive( :delete ).with( 4 )
+    buffer.should_receive( :delete ).with( 2 )
+    buffer.should_receive( :delete ).with( 2 )
     r = RubyRefactorer.new
 
-    range = Range.new 2, VIM_FULL_LINE_SELECTION_COLUMN_START, 4, VIM_FULL_LINE_SELECTION_COLUMN_END
+    range = Range.new 2, Range::MIN_COLUMN, 4, Range::BEYOND_MAX_COLUMN 
     r.extract_method "new_method_name", buffer, range
   end
 
