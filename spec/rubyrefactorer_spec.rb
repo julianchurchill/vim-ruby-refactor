@@ -77,6 +77,21 @@ describe "RubyRefactorer" do
     buffer[3].should_not == "abcdefgh"
   end
 
+  it "should add a new line with the function definition immediately after the highlighted text" do
+    buffer = VIM::Buffer.new
+    buffer[1] = ""
+    buffer[2] = "12345678"
+    buffer[3] = "abcdefgh"
+    r = RubyRefactorer.new
+
+    range = Range.new 2, 5, 3, 4
+    r.extract_method "new_method_name", buffer, range
+
+    buffer[1].should == ""
+    buffer[2].should == "1234efgh"
+    buffer[3].should == "def new_method_name"
+  end
+
   it "should paste the highlighted text after the new function definition"
   it "should include the function arguments in the definition"
   it "should postfix the end keyword with an additional newline after the new function"

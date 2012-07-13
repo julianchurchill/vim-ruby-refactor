@@ -42,6 +42,13 @@ class RubyRefactorer
   def extract_method name, buffer, range
     @buffer = buffer
     @range = range
+
+    remove_highlighted_text
+
+    @buffer[ @range.start_line + 1 ] = "def #{name}"
+  end
+
+ def remove_highlighted_text
     (@range.start_line..@range.end_line).each do |line_number|
       remove_highlighted_part_of_line line_number
     end
@@ -52,7 +59,7 @@ class RubyRefactorer
     end
 
     remove_lines_scheduled_for_delete
-  end
+ end
 
   def start_and_end_lines_need_joining?
     if not @range.whole_start_line_is_in_range? and
