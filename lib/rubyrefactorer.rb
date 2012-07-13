@@ -35,15 +35,23 @@ end
 
 class RubyRefactorer
 
-  def initialize
-    @lines_to_delete = []
-  end
-
   def extract_method name, buffer, range
     @buffer = buffer
     @range = range
+    @lines_to_delete = []
+    @highlighted_text = [] 
+
     remove_highlighted_text
     add_function_definition name
+    add_highlighted_text
+  end
+
+  def add_highlighted_text
+    offset = 2
+    @highlighted_text.each do |line|
+      @buffer[ @range.start_line + offset ] = line
+      offset += 1
+    end
   end
 
   def add_function_definition name
@@ -77,6 +85,7 @@ class RubyRefactorer
   def remove_highlighted_part_of_line line_number
     if @range.whole_line_is_in_range? line_number
       @lines_to_delete += [ line_number ]
+      @highlighted_text += [ @buffer[ line_number ] ]
     else
       remove_partially_highlighted_line line_number
     end
@@ -84,6 +93,7 @@ class RubyRefactorer
 
   def remove_partially_highlighted_line line_number
     line = ""
+    save_highlighted_text line_number
     if line_number == @range.start_line
       line = extract_line_start @buffer[ line_number ]
     end
@@ -91,6 +101,18 @@ class RubyRefactorer
       line += extract_line_end @buffer[ line_number ]
     end
     @buffer[ line_number ] = line
+  end
+
+  def save_highlighted_text line_number
+    start_highlight = @range.start_character-1
+    end_highlight = @range.end_character-1
+    if line_number == @range.start_line and line_number == @range.end_line
+      @highlighted_text += [ @buffer[ line_number][start_highlight..end_highlight] ]
+    elsif line_number == @range.start_line
+      @highlighted_text += [ @buffer[ line_number][start_highlight..-1] ]
+    elsif line_number == @range.end_line
+      @highlighted_text += [ @buffer[ line_number][0..end_highlight] ]
+    end
   end
 
   def remove_lines_scheduled_for_delete
