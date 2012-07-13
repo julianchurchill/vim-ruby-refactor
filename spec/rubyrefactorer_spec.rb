@@ -41,12 +41,11 @@ describe "RubyRefactorer" do
     range = Range.new 2, 3, 2, 6
     r.extract_method "new_method_name", buffer, range
 
-    buffer.count.should == 2
     buffer[1].should == ""
     buffer[2].should == "1278"
   end
 
-  it "should cut whole lines from multi line highlighted text from the vim buffer with extreme ranges" do
+  it "should cut whole lines from multi line highlighted text" do
     buffer = VIM::Buffer.new
     buffer[1] = ""
     buffer[2] = "12345678"
@@ -57,8 +56,10 @@ describe "RubyRefactorer" do
     range = Range.new 2, Range::MIN_COLUMN, 4, Range::BEYOND_MAX_COLUMN 
     r.extract_method "new_method_name", buffer, range
 
-    buffer.count.should == 1
     buffer[1].should == ""
+    buffer[2].should_not == "12345678"
+    buffer[3].should_not == "abcdefgh"
+    buffer[4].should_not == "abcdefgh"
   end
 
   it "should join partial lines that are included in the highlighted text" do
@@ -71,13 +72,12 @@ describe "RubyRefactorer" do
     range = Range.new 2, 5, 3, 4
     r.extract_method "new_method_name", buffer, range
 
-    buffer.count.should == 2
     buffer[1].should == ""
     buffer[2].should == "1234efgh"
+    buffer[3].should_not == "abcdefgh"
   end
 
-  it "should paste the highlighted text after the current function"
-  it "should precede the pasted text with a new line and the function definition"
+  it "should paste the highlighted text after the new function definition"
   it "should include the function arguments in the definition"
   it "should postfix the end keyword with an additional newline after the new function"
   it "should replace the highlighted text with a call to the new function"
