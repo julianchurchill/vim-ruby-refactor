@@ -14,20 +14,22 @@ class Range
 
   def whole_line_is_in_range? line_number
     line_internal_to_range? line_number or
-    whole_start_line_is_in_range? line_number or
-    whole_end_line_is_in_range? line_number
+    (line_number == @start_line and whole_start_line_is_in_range?) or
+    (line_number == @end_line and whole_end_line_is_in_range?)
   end
 
   def line_internal_to_range? line_number
       line_number != @start_line and line_number != @end_line
   end
 
-  def whole_start_line_is_in_range? line_number
-      line_number == @start_line and @start_character == Range::MIN_COLUMN and line_number != @end_line
+  def whole_start_line_is_in_range?
+      @start_character == Range::MIN_COLUMN and
+      (@start_line != @end_line or @end_character == Range::BEYOND_MAX_COLUMN)
   end
 
-  def whole_end_line_is_in_range? line_number
-      line_number == @end_line and @end_character == Range::BEYOND_MAX_COLUMN and line_number != @start_line
+  def whole_end_line_is_in_range?
+      @end_character == Range::BEYOND_MAX_COLUMN and
+      (@start_line != @end_line or @start_character == Range::MIN_COLUMN)
   end
 end
 
@@ -43,7 +45,22 @@ class RubyRefactorer
     (@range.start_line..@range.end_line).each do |line_number|
       remove_highlighted_part_of_line line_number
     end
+
+    if start_and_end_lines_need_joining?
+      @buffer[ @range.start_line ] += @buffer[ @range.end_line ]
+      @lines_to_delete += [@range.end_line]
+    end
+
     remove_lines_scheduled_for_delete
+  end
+
+  def start_and_end_lines_need_joining?
+    if not @range.whole_start_line_is_in_range? and
+       not @range.whole_end_line_is_in_range? and
+       @range.start_line != @range.end_line
+       return true
+    end
+    false
   end
 
   def remove_highlighted_part_of_line line_number
