@@ -33,36 +33,35 @@ end
 
 describe "RubyRefactorer" do
   it "should cut single line highlighted text from the vim buffer" do
-    buffer = double( 'current vim buffer' )
-    buffer.stub( :[] ).with( 2 ).and_return( "12345678" )
-    buffer.should_receive( :[]= ).with( 2, "1278" )
+    buffer = VIM::Buffer.new
+    buffer[1] = ""
+    buffer[2] = "12345678"
     r = RubyRefactorer.new
 
     range = Range.new 2, 3, 2, 6
     r.extract_method "new_method_name", buffer, range
+
+    buffer.count.should == 2
+    buffer[1].should == ""
+    buffer[2].should == "1278"
   end
 
   it "should cut whole lines from multi line highlighted text from the vim buffer with extreme ranges" do
-    buffer = double( 'current vim buffer' )
-    buffer.stub( :[] ).with( 2 ).and_return( "12345678" )
-    buffer.stub( :[] ).with( 3 ).and_return( "abcdefgh" )
-    buffer.stub( :[] ).with( 4 ).and_return( "abcdefgh" )
-    # Delete line 2 three times because after each delete the indices are renumbered
-    buffer.should_receive( :delete ).with( 2 )
-    buffer.should_receive( :delete ).with( 2 )
-    buffer.should_receive( :delete ).with( 2 )
+    buffer = VIM::Buffer.new
+    buffer[1] = ""
+    buffer[2] = "12345678"
+    buffer[3] = "abcdefgh"
+    buffer[4] = "abcdefgh"
     r = RubyRefactorer.new
 
     range = Range.new 2, Range::MIN_COLUMN, 4, Range::BEYOND_MAX_COLUMN 
     r.extract_method "new_method_name", buffer, range
+
+    buffer.count.should == 1
+    buffer[1].should == ""
   end
 
   it "should join partial lines that are included in the highlighted text" do
-    #buffer = double( 'current vim buffer' )
-    #buffer.stub( :[] ).with( 2 ).and_return( "12345678" )
-    #buffer.stub( :[] ).with( 3 ).and_return( "abcdefgh" )
-    #buffer.should_receive( :[]= ).with( 2, "1234efgh" )
-    #buffer.should_receive( :delete ).with( 3 )
     buffer = VIM::Buffer.new
     buffer[1] = ""
     buffer[2] = "12345678"
