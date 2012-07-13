@@ -110,7 +110,6 @@ class RubyRefactorer
   def save_highlighted_text line_number
     start_highlight = @range.start_character-1
     end_highlight = @range.end_character-1
-    #if line_number == @range.start_line and line_number == @range.end_line
     if @range.single_line_range?
       @highlighted_text += [ @buffer[ line_number][start_highlight..end_highlight] ]
     elsif line_number == @range.start_line

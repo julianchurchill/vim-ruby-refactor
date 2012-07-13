@@ -111,7 +111,21 @@ describe "RubyRefactorer" do
     buffer[6].should == "ijkl"
   end
 
-  it "should paste the single line highlighted text after the new function definition"
+  it "should paste the single line highlighted text after the new function definition" do
+    buffer = VIM::Buffer.new
+    buffer[1] = ""
+    buffer[2] = "12345678"
+    r = RubyRefactorer.new
+
+    range = Range.new 2, 3, 2, 6
+    r.extract_method "new_method_name", buffer, range
+
+    buffer[1].should == ""
+    buffer[2].should == "1278"
+    buffer[3].should == "def new_method_name"
+    buffer[4].should == "3456"
+  end
+
   it "new function should not overwrite lines after the highlighted text"
   it "should include the function arguments in the definition"
   it "should postfix the end keyword with an additional newline after the new function"
