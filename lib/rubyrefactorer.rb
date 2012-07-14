@@ -38,6 +38,7 @@ class Range
 end
 
 class RubyRefactorer
+  NEW_METHOD_OFFSET_FROM_HIGHLIGHTED_TEXT = 1
 
   def extract_method name, buffer, range
     @buffer = buffer
@@ -46,21 +47,37 @@ class RubyRefactorer
     @highlighted_text = [] 
 
     remove_highlighted_text
-    add_function_definition name
-    add_highlighted_text
-    @buffer[ @range.start_line + @highlighted_text.size + 2 ] = "end"
+    add_method_definition name
+    add_method_content
+    add_method_end
   end
 
-  def add_highlighted_text
-    offset = 2
+  def add_method_end
+    @buffer[ new_method_end_line ] = "end"
+  end
+
+  def new_method_end_line
+    new_method_start_line + new_method_content_size + 1
+  end
+
+  def new_method_content_size
+    @highlighted_text.size
+  end
+
+  def add_method_content
+    new_method_content_line = new_method_start_line + 1
     @highlighted_text.each do |line|
-      @buffer[ @range.start_line + offset ] = line
-      offset += 1
+      @buffer[ new_method_content_line ] = line
+      new_method_content_line += 1
     end
   end
 
-  def add_function_definition name
-    @buffer[ @range.start_line + 1 ] = "def #{name}"
+  def add_method_definition name
+    @buffer[ new_method_start_line ] = "def #{name}"
+  end
+
+  def new_method_start_line
+    @range.start_line + NEW_METHOD_OFFSET_FROM_HIGHLIGHTED_TEXT
   end
 
   def remove_highlighted_text
