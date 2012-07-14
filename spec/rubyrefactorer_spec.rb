@@ -120,14 +120,40 @@ describe "RubyRefactorer" do
     range = Range.new 2, 3, 2, 6
     r.extract_method "new_method_name", buffer, range
 
+    # This needs to be made less specific to a index, how to make the test relative?
     buffer[1].should == ""
     buffer[2].should == "1278"
     buffer[3].should == "def new_method_name"
     buffer[4].should == "3456"
   end
 
+  it "should postfix the end keyword on a new line after the new function" do
+    buffer = VIM::Buffer.new
+    buffer[1] = ""
+    buffer[2] = "12345678"
+    r = RubyRefactorer.new
+
+    range = Range.new 2, 3, 2, 6
+    r.extract_method "new_method_name", buffer, range
+
+    buffer[5].should == "end"
+  end
+
   it "new function should not overwrite lines after the highlighted text"
+    #buffer = VIM::Buffer.new
+    #buffer[1] = ""
+    #buffer[2] = "12345678"
+    #buffer[3] = "abcdefgh"
+    #r = RubyRefactorer.new
+
+    #range = Range.new 2, 3, 2, 6
+    #r.extract_method "new_method_name", buffer, range
+
+    ## line 2 is the original highlighted line, followed by line 3 as the
+    ## function definition and line 4 as the cut highlighted content
+    ## line 5 as the function end so line 6 hould be untouched
+    #buffer[6].should == "abcdefgh"
+  #end
   it "should include the function arguments in the definition"
-  it "should postfix the end keyword with an additional newline after the new function"
   it "should replace the highlighted text with a call to the new function"
 end

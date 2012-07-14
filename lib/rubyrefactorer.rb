@@ -48,6 +48,7 @@ class RubyRefactorer
     remove_highlighted_text
     add_function_definition name
     add_highlighted_text
+    @buffer[ @range.start_line + @highlighted_text.size + 2 ] = "end"
   end
 
   def add_highlighted_text
