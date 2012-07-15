@@ -87,8 +87,6 @@ describe "RubyRefactorer" do
     range = Range.new 2, 5, 3, 4
     r.extract_method "new_method_name", buffer, range
 
-    buffer[1].should == ""
-    buffer[2].should == "1234efgh"
     buffer[3].should == "def new_method_name"
   end
 
@@ -103,9 +101,6 @@ describe "RubyRefactorer" do
     range = Range.new 2, 5, 4, 4
     r.extract_method "new_method_name", buffer, range
 
-    buffer[1].should == ""
-    buffer[2].should == "1234mnop"
-    buffer[3].should == "def new_method_name"
     buffer[4].should == "5678"
     buffer[5].should == "abcdefgh"
     buffer[6].should == "ijkl"
@@ -120,10 +115,6 @@ describe "RubyRefactorer" do
     range = Range.new 2, 3, 2, 6
     r.extract_method "new_method_name", buffer, range
 
-    # This needs to be made less specific to a index, how to make the test relative?
-    buffer[1].should == ""
-    buffer[2].should == "1278"
-    buffer[3].should == "def new_method_name"
     buffer[4].should == "3456"
   end
 
@@ -136,7 +127,7 @@ describe "RubyRefactorer" do
     range = Range.new 2, 3, 2, 6
     r.extract_method "new_method_name", buffer, range
 
-    buffer[5].should == "end"
+    buffer[r.new_method_end_line].should == "end"
   end
 
   it "new function should not overwrite lines after the highlighted text"
