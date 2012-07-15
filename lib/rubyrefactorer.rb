@@ -53,7 +53,7 @@ class RubyRefactorer
   end
 
   def add_method_end
-    @buffer[ new_method_end_line ] = "end"
+    @buffer.append new_method_end_line-1, "end"
   end
 
   def new_method_end_line
@@ -67,13 +67,13 @@ class RubyRefactorer
   def add_method_content
     new_method_content_line = new_method_start_line + 1
     @highlighted_text.each do |line|
-      @buffer[ new_method_content_line ] = line
+      @buffer.append new_method_content_line-1, line
       new_method_content_line += 1
     end
   end
 
   def add_method_definition name
-    @buffer[ new_method_start_line ] = "def #{name}"
+    @buffer.append new_method_start_line-1, "def #{name}"
   end
 
   def new_method_start_line

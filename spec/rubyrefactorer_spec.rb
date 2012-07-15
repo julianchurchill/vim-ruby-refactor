@@ -14,19 +14,26 @@ module VIM
       @lines.size
     end
 
-    def append position, content
+    def append index, content
+      @lines.insert rebase( index ) + 1, content
     end
 
     def []= index, content
-      @lines[index-1] = content
+      @lines[rebase index] = content
     end
 
     def [] index
-      @lines[index-1]
+      @lines[rebase index]
     end
 
     def delete index
-      @lines.delete_at index-1
+      @lines.delete_at rebase index
+    end
+
+    private
+
+    def rebase index
+      index - 1
     end
   end
 end
@@ -130,21 +137,19 @@ describe "RubyRefactorer" do
     buffer[r.new_method_end_line].should == "end"
   end
 
-  it "new function should not overwrite lines after the highlighted text"
-    #buffer = VIM::Buffer.new
-    #buffer[1] = ""
-    #buffer[2] = "12345678"
-    #buffer[3] = "abcdefgh"
-    #r = RubyRefactorer.new
+  it "new function should not overwrite lines after the highlighted text" do
+    buffer = VIM::Buffer.new
+    buffer[1] = ""
+    buffer[2] = "12345678"
+    buffer[3] = "abcdefgh"
+    r = RubyRefactorer.new
 
-    #range = Range.new 2, 3, 2, 6
-    #r.extract_method "new_method_name", buffer, range
+    range = Range.new 2, 3, 2, 6
+    r.extract_method "new_method_name", buffer, range
 
-    ## line 2 is the original highlighted line, followed by line 3 as the
-    ## function definition and line 4 as the cut highlighted content
-    ## line 5 as the function end so line 6 hould be untouched
-    #buffer[6].should == "abcdefgh"
-  #end
+    buffer[r.new_method_end_line+1].should == "abcdefgh"
+  end
+
   it "should include the function arguments in the definition"
   it "should replace the highlighted text with a call to the new function"
 end
