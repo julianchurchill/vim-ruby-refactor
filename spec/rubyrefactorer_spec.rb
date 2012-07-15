@@ -49,7 +49,8 @@ describe "RubyRefactorer" do
     r.extract_method "new_method_name", buffer, range
 
     buffer[1].should == ""
-    buffer[2].should == "1278"
+    buffer[2].should_not == "12345678"
+    buffer[2].should =~ /^12.*78$/
   end
 
   it "should cut whole lines from multi line highlighted text" do
@@ -80,7 +81,8 @@ describe "RubyRefactorer" do
     r.extract_method "new_method_name", buffer, range
 
     buffer[1].should == ""
-    buffer[2].should == "1234efgh"
+    buffer[2].should_not == "12345678"
+    buffer[2].should =~ /^1234.*efgh$/
     buffer[3].should_not == "abcdefgh"
   end
 
@@ -150,6 +152,6 @@ describe "RubyRefactorer" do
     buffer[r.new_method_end_line+1].should == "abcdefgh"
   end
 
-  it "should include the function arguments in the definition"
   it "should replace the highlighted text with a call to the new function"
+  it "should include the function arguments in the definition"
 end
