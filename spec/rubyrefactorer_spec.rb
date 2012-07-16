@@ -152,6 +152,30 @@ describe "RubyRefactorer" do
     buffer[r.new_method_end_line+1].should == "abcdefgh"
   end
 
-  it "should replace the highlighted text with a call to the new function"
+  it "should replace the single line highlighted text with a call to the new function" do
+    buffer = VIM::Buffer.new
+    buffer[1] = ""
+    buffer[2] = "12345678"
+    r = RubyRefactorer.new
+
+    range = Range.new 2, 3, 2, 6
+    r.extract_method "new_method_name", buffer, range
+
+    buffer[2].should == "12new_method_name78"
+  end
+
+  it "should replace the multi line highlighted text with a call to the new function" do
+    buffer = VIM::Buffer.new
+    buffer[1] = ""
+    buffer[2] = "12345678"
+    buffer[3] = "abcdefgh"
+    r = RubyRefactorer.new
+
+    range = Range.new 2, 3, 3, 6
+    r.extract_method "new_method_name", buffer, range
+
+    buffer[2].should == "12new_method_namegh"
+  end
+
   it "should include the function arguments in the definition"
 end

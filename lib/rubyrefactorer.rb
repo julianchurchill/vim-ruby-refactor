@@ -41,6 +41,7 @@ class RubyRefactorer
   NEW_METHOD_OFFSET_FROM_HIGHLIGHTED_TEXT = 1
 
   def extract_method name, buffer, range
+    @name = name
     @buffer = buffer
     @range = range
     @lines_to_delete = []
@@ -90,6 +91,7 @@ class RubyRefactorer
 
   def collapse_start_and_end_lines
     if start_and_end_lines_need_joining?
+      @buffer[ @range.start_line ] += @name
       @buffer[ @range.start_line ] += @buffer[ @range.end_line ]
       @lines_to_delete += [@range.end_line]
     end
@@ -119,10 +121,16 @@ class RubyRefactorer
     if line_number == @range.start_line
       line = extract_line_start @buffer[ line_number ]
     end
+    line += add_method_call
     if line_number == @range.end_line
       line += extract_line_end @buffer[ line_number ]
     end
     @buffer[ line_number ] = line
+  end
+
+  def add_method_call
+    return @name if @range.single_line_range?
+    ""
   end
 
   def save_highlighted_text line_number
