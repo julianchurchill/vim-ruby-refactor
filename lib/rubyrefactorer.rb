@@ -45,10 +45,10 @@ class RubyRefactorer
     @buffer = buffer
     @range = range
     @lines_to_delete = []
-    @highlighted_text = [] 
+    @highlighted_text = []
 
     remove_highlighted_text
-    add_method_definition name
+    add_method_definition
     add_method_content
     add_method_end
   end
@@ -73,8 +73,8 @@ class RubyRefactorer
     end
   end
 
-  def add_method_definition name
-    @buffer.append new_method_start_line-1, "def #{name}"
+  def add_method_definition
+    @buffer.append new_method_start_line-1, "def #{@name}"
   end
 
   def new_method_start_line
@@ -116,21 +116,11 @@ class RubyRefactorer
   end
 
   def remove_partially_highlighted_line line_number
-    line = ""
     save_highlighted_text line_number
-    if line_number == @range.start_line
-      line = extract_line_start @buffer[ line_number ]
-    end
+    line = add_start_of_line line_number
     line += add_method_call
-    if line_number == @range.end_line
-      line += extract_line_end @buffer[ line_number ]
-    end
+    line += add_end_of_line line_number
     @buffer[ line_number ] = line
-  end
-
-  def add_method_call
-    return @name if @range.single_line_range?
-    ""
   end
 
   def save_highlighted_text line_number
@@ -143,6 +133,25 @@ class RubyRefactorer
     elsif line_number == @range.end_line
       @highlighted_text += [ @buffer[ line_number][0..end_highlight] ]
     end
+  end
+
+  def add_start_of_line line_number
+    if line_number == @range.start_line
+      return extract_line_start @buffer[ line_number ]
+    end
+    ""
+  end
+
+  def add_method_call
+    return @name if @range.single_line_range?
+    ""
+  end
+
+  def add_end_of_line line_number
+    if line_number == @range.end_line
+      return extract_line_end @buffer[ line_number ]
+    end
+    ""
   end
 
   def remove_lines_scheduled_for_delete
