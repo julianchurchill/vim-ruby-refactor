@@ -37,6 +37,55 @@ class Range
   end
 end
 
+class LineConstructor
+  def initialize range, buffer, name, line_number
+    @range = range
+    @buffer = buffer
+    @name = name
+    @line_number = line_number
+  end
+
+  def construct
+    line = add_start_of_line
+    line += add_method_call
+    line += add_end_of_line
+    line
+  end
+
+  def add_start_of_line
+    if @line_number == @range.start_line
+      return extract_line_start @buffer[ @line_number ]
+    end
+    ""
+  end
+
+  def extract_line_start line
+    turn_nil_to_blank_string line[0...@range.start_character-1]
+  end
+
+  def turn_nil_to_blank_string string
+    return "" if string == nil
+    string
+  end
+
+  def add_method_call
+    return @name if @range.single_line_range?
+    ""
+  end
+
+  def add_end_of_line
+    if @line_number == @range.end_line
+      return extract_line_end @buffer[ @line_number ]
+    end
+    ""
+  end
+
+  def extract_line_end line
+    turn_nil_to_blank_string line[@range.end_character..-1]
+  end
+
+end
+
 class RubyRefactorer
   NEW_METHOD_OFFSET_FROM_HIGHLIGHTED_TEXT = 1
 
@@ -117,10 +166,8 @@ class RubyRefactorer
 
   def remove_partially_highlighted_line line_number
     save_highlighted_text line_number
-    line = add_start_of_line line_number
-    line += add_method_call
-    line += add_end_of_line line_number
-    @buffer[ line_number ] = line
+    l = LineConstructor.new @range, @buffer, @name, line_number
+    @buffer[ line_number ] = l.construct
   end
 
   def save_highlighted_text line_number
@@ -135,44 +182,12 @@ class RubyRefactorer
     end
   end
 
-  def add_start_of_line line_number
-    if line_number == @range.start_line
-      return extract_line_start @buffer[ line_number ]
-    end
-    ""
-  end
-
-  def add_method_call
-    return @name if @range.single_line_range?
-    ""
-  end
-
-  def add_end_of_line line_number
-    if line_number == @range.end_line
-      return extract_line_end @buffer[ line_number ]
-    end
-    ""
-  end
-
   def remove_lines_scheduled_for_delete
     total_lines_deleted = 0
     @lines_to_delete.each do |line_number|
       @buffer.delete( line_number - total_lines_deleted )
       total_lines_deleted += 1
     end
-  end
-
-  def extract_line_start line
-    turn_nil_to_blank_string line[0...@range.start_character-1]
-  end
-
-  def turn_nil_to_blank_string string
-    return "" if string == nil
-    string
-  end
-
-  def extract_line_end line
-    turn_nil_to_blank_string line[@range.end_character..-1]
   end
 end
 
