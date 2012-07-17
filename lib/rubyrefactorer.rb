@@ -1,3 +1,4 @@
+require 'variableextractor.rb'
 
 # 1 based - to match Vims notion of ranges
 class Range
@@ -123,12 +124,14 @@ class RubyRefactorer
   end
 
   def add_method_definition
-    @buffer.append new_method_start_line-1, "def #{@name}#{extract_method_parameters}"
+    @buffer.append new_method_start_line-1, "def #{@name}#{extract_variables}"
   end
 
-  def extract_method_parameters
-    return " a b" if @highlighted_text == [ "a == b" ]
-    ""
+  def extract_variables
+    v = VariableExtractor.new @highlighted_text
+    variables = ""
+    v.extract.each { |v| variables += " #{v}" }
+    variables
   end
 
   def new_method_start_line
