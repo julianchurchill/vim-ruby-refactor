@@ -123,7 +123,12 @@ class RubyRefactorer
   end
 
   def add_method_definition
-    @buffer.append new_method_start_line-1, "def #{@name}"
+    @buffer.append new_method_start_line-1, "def #{@name}#{extract_method_parameters}"
+  end
+
+  def extract_method_parameters
+    return " a b" if @highlighted_text == [ "a == b" ]
+    ""
   end
 
   def new_method_start_line

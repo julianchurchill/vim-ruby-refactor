@@ -177,5 +177,17 @@ describe "RubyRefactorer" do
     buffer[2].should == "12new_method_namegh"
   end
 
-  it "should include the function arguments in the definition"
+  it "should include the method arguments in the definition" do
+    buffer = VIM::Buffer.new
+    buffer[1] = ""
+    buffer[2] = "a == b"
+    r = RubyRefactorer.new
+
+    range = Range.new 2, 1, 2, 6
+    r.extract_method "new_method_name", buffer, range
+
+    buffer[3].should == "def new_method_name a b"
+  end
+
+  it "should include the method arguments in the method call"
 end
